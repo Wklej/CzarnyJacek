@@ -1,4 +1,4 @@
-package com.czarnyjacek.objects.engine;
+package com.czarnyjacek.engine;
 
 import com.czarnyjacek.objects.Card;
 import com.czarnyjacek.objects.Deck;

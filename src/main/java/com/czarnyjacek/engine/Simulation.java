@@ -1,7 +1,6 @@
-package com.czarnyjacek;
+package com.czarnyjacek.engine;
 
 import com.czarnyjacek.objects.Card;
-import com.czarnyjacek.objects.engine.Game;
 
 import java.util.List;
 import java.util.concurrent.Executors;

@@ -1,5 +1,6 @@
-package com.czarnyjacek.objects.engine;
+package com.czarnyjacek.objects;
 
+import com.czarnyjacek.engine.Game;
 import com.czarnyjacek.objects.Card;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.czarnyjacek;
 
-import com.czarnyjacek.objects.engine.Strategies;
+import com.czarnyjacek.engine.Simulation;
+import com.czarnyjacek.objects.Strategies;
 
 import java.util.List;
 
