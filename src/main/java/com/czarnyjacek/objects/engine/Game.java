@@ -2,6 +2,7 @@ package com.czarnyjacek.objects.engine;
 
 import com.czarnyjacek.objects.Card;
 import com.czarnyjacek.objects.Deck;
+import com.czarnyjacek.objects.Result;
 import com.czarnyjacek.objects.enums.RANK;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,11 +27,6 @@ public class Game {
         start();
     }
 
-    public Game(Predicate<List<Card>> strategy) {
-        this();
-        simulation(strategy);
-    }
-
     private void start() {
         playerHand.addAll(List.of(deck.dealCard(), deck.dealCard()));
         dealerHand.addAll(List.of(deck.dealCard(), deck.dealCard()));
@@ -40,7 +36,7 @@ public class Game {
         playerInfo();
     }
 
-    public void simulation(Predicate<List<Card>> strategy) {
+    public Result simulation(Predicate<List<Card>> strategy) {
         while (strategy.test(playerHand) || isBlackJack(playerHand)) {
             playerDraw();
         }
@@ -51,6 +47,8 @@ public class Game {
         } else {
             callBust();
         }
+
+        return new Result(checkWinner(), playerScore, dealerScore, playerHand, dealerHand);
     }
 
     private String checkWinner() {
