@@ -1,12 +1,14 @@
-package com.czarnyjacek.objects.engine;
+package com.czarnyjacek.engine;
 
 import com.czarnyjacek.objects.Card;
 import com.czarnyjacek.objects.Deck;
+import com.czarnyjacek.objects.Result;
 import com.czarnyjacek.objects.enums.RANK;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Slf4j
 public class Game {
@@ -34,9 +36,8 @@ public class Game {
         playerInfo();
     }
 
-    public void simulation() {
-        //one strategy - DRAW until >= 18
-        while (playerScore <= 18 || isBlackJack(playerHand)) {
+    public Result simulation(Predicate<List<Card>> strategy) {
+        while (strategy.test(playerHand) || isBlackJack(playerHand)) {
             playerDraw();
         }
 
@@ -46,6 +47,8 @@ public class Game {
         } else {
             callBust();
         }
+
+        return new Result(checkWinner(), playerScore, dealerScore, playerHand, dealerHand);
     }
 
     private String checkWinner() {
@@ -78,7 +81,7 @@ public class Game {
         dealerInfo();
     }
 
-    private Integer calculateHand(List<Card> hand) {
+    public static Integer calculateHand(List<Card> hand) {
         int sum = hand.stream()
                 .map(Card::value)
                 .reduce(0, Integer::sum);
