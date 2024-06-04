@@ -4,6 +4,7 @@ import com.czarnyjacek.objects.Card;
 import com.czarnyjacek.objects.Deck;
 import com.czarnyjacek.objects.Result;
 import com.czarnyjacek.objects.enums.RANK;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -12,105 +13,34 @@ import java.util.function.Predicate;
 
 @Slf4j
 public class Game {
-    private final Deck deck;
-    private final List<Card> playerHand;
-    private final List<Card> dealerHand;
-    private int playerScore;
-    private int dealerScore;
+    //TODO: game should hold deck?
 
-    public Game() {
-        deck = new Deck();
-        playerHand = new ArrayList<>();
-        dealerHand = new ArrayList<>();
-        playerScore = 0;
-        dealerScore = 0;
-        start();
+    private final Round primaryRound;
+    private final Predicate<List<Card>> strategy;
+
+    public Game(Predicate<List<Card>> strategy) {
+        primaryRound = new Round();
+        this.strategy = strategy;
     }
 
-    private void start() {
-        playerHand.addAll(List.of(deck.dealCard(), deck.dealCard()));
-        dealerHand.addAll(List.of(deck.dealCard(), deck.dealCard()));
-        playerScore = calculateHand(playerHand);
-        dealerScore = calculateHand(dealerHand);
-        dealerInfo();
-        playerInfo();
-    }
+    public List<Result> play() {
+        List<Result> results = new ArrayList<>();
 
-    public Result simulation(Predicate<List<Card>> strategy) {
-        while (strategy.test(playerHand) || isBlackJack(playerHand)) {
-            playerDraw();
+        //TODO: add split strategy
+        if (isSplitAvailable(primaryRound.getPlayerHand())) {
+            System.out.println("SPLITTING.....");
+            var splitCard = primaryRound.getPlayerHand().removeLast();
+            var splitRound = new Round(primaryRound.getDealerHand(), splitCard);
+
+            results.add(splitRound.play(strategy));
         }
 
-        if (!isBust(playerScore)) {
-            dealerDraw();
-            callWinner(checkWinner());
-        } else {
-            callBust();
-        }
+        results.add(primaryRound.play(strategy));
 
-        return new Result(checkWinner(), playerScore, dealerScore, playerHand, dealerHand);
+        return results;
     }
 
-    private String checkWinner() {
-        if (isBust(dealerScore)) return "PLAYER";
-        else if (playerScore == dealerScore) return "DRAW";
-        else if (playerScore > dealerScore) return "PLAYER";
-        else return "DEALER";
-    }
-
-    private void callWinner(String winner) {
-        log.info("PLAYER score: " + playerScore + " DEALER score: " + dealerScore);
-        log.info("The winner is: " + winner);
-    }
-
-    private void callBust() {
-        log.info("The winner is: DEALER - PLAYER BUSTED with score: " + playerScore);
-    }
-
-    private void playerDraw() {
-        playerHand.add(deck.dealCard());
-        playerScore = calculateHand(playerHand);
-        playerInfo();
-    }
-
-    private void dealerDraw() {
-        while (dealerScore <= 17 || isBlackJack(dealerHand)) {
-            dealerHand.add(deck.dealCard());
-            dealerScore = calculateHand(dealerHand);
-        }
-        dealerInfo();
-    }
-
-    public static Integer calculateHand(List<Card> hand) {
-        int sum = hand.stream()
-                .map(Card::value)
-                .reduce(0, Integer::sum);
-
-        long aceCount = hand.stream()
-                .filter(card -> card.rank() == RANK.ACE)
-                .count();
-
-        while (sum > 21 && aceCount > 0) {
-            sum -= 10;
-            aceCount--;
-        }
-
-        return sum;
-    }
-
-    private void playerInfo() {
-        log.info("player: " + playerHand);
-    }
-
-    private void dealerInfo() {
-        log.info("dealer: " + dealerHand);
-    }
-
-    private boolean isBust(int playerScore) {
-        return playerScore > 21;
-    }
-
-    private boolean isBlackJack(List<Card> hand) {
-        return hand.size() == 2 && calculateHand(hand) == 21;
+    private boolean isSplitAvailable(List<Card> hand) {
+        return hand.getFirst().rank() == hand.getLast().rank();
     }
 }
