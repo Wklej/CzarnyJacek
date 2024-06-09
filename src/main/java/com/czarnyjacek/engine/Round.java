@@ -27,6 +27,9 @@ public class Round {
         dealerHand = new ArrayList<>(){{addAll(List.of(deck.dealCard(), deck.dealCard()));}};
     }
 
+    /**
+     * Constructor used for splitting.
+     */
     public Round(List<Card> dealerHand, Card splitCard) {
         this();
         this.dealerHand = dealerHand;
