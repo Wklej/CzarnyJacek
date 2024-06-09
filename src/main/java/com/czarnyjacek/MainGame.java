@@ -7,6 +7,17 @@ import java.util.List;
 
 public class MainGame {
     public static void main(String[] args) {
-        Simulation.run(2, List.of(Strategies::drawUntil17, Strategies::drawUntil18));
+        var simulation = new Simulation(10,
+                List.of(
+//                    Strategies::drawUntil17,
+                        Strategies::drawUntil18
+                ),
+                List.of(
+//                        Strategies::splitAceAnd8,
+                        Strategies::splitAceAnd8
+                ),
+                100
+                );
+        simulation.run();
     }
 }

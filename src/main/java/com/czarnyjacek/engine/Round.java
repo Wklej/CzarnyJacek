@@ -40,22 +40,20 @@ public class Round {
     public Result play(Predicate<List<Card>> strategy) {
         this.playerScore = calculateHand(playerHand);
         this.dealerScore = calculateHand(dealerHand);
-        playerInfo();
-        dealerInfo();
-        while (strategy.test(playerHand) || isBlackJack(playerHand)) {
+
+        while (strategy.test(playerHand) && !isBlackJack(playerHand)) {
             playerDraw();
+        }
+
+        if (isBlackJack(playerHand) && !isBlackJack(dealerHand)) {
+            return new Result("PLAYER", playerScore, dealerScore, playerHand, dealerHand);
         }
 
         if (!isBust(playerScore)) {
             dealerDraw();
-            callWinner(checkWinner());
         } else {
-            callBust();
             return new Result("DEALER", playerScore, dealerScore, playerHand, dealerHand);
         }
-
-        playerInfo();
-        dealerInfo();
 
         return new Result(checkWinner(), playerScore, dealerScore, playerHand, dealerHand);
     }
@@ -82,7 +80,7 @@ public class Round {
     }
 
     private void dealerDraw() {
-        while (dealerScore <= 17 || isBlackJack(dealerHand)) {
+        while (dealerScore <= 17) {
             dealerHand.add(deck.dealCard());
             dealerScore = calculateHand(dealerHand);
         }
@@ -117,7 +115,7 @@ public class Round {
         return playerScore > 21;
     }
 
-    private boolean isBlackJack(List<Card> hand) {
+    public static boolean isBlackJack(List<Card> hand) {
         return hand.size() == 2 && calculateHand(hand) == 21;
     }
 }
