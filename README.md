@@ -1,0 +1,3 @@
+## Just Black Jack simulator 
+
+Work in progress...
